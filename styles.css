@@ -1145,13 +1145,13 @@ body.fullscreen-open {
     position: absolute;
     left: calc(50% - 55px);
     transform-origin: bottom center;
-    transform: translateX(-50%) scale(2.38);
-    bottom: env(safe-area-inset-bottom, 0px);
+    transform: translateX(-50%) scale(2.0);
+    bottom: calc(env(safe-area-inset-bottom, 0px) - 40px);
     width: min(220px, 55vw);
     height: auto;
-    max-height: 65vh;
+    max-height: 55vh;
     object-fit: contain;
-    z-index: 10005;
+    z-index: 10000;
     pointer-events: none;
     opacity: 1;
 }
@@ -1159,13 +1159,13 @@ body.fullscreen-open {
 .fullscreen-candle-video-5 {
     position: absolute;
     right: 18px;
-    bottom: env(safe-area-inset-bottom, 0px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) - 30px);
     width: 32%;
     max-width: 140px;
     height: auto;
-    max-height: 24vh;
+    max-height: 20vh;
     object-fit: contain;
-    z-index: 10005;
+    z-index: 10000;
     pointer-events: none;
     opacity: 1;
 }
@@ -1382,7 +1382,7 @@ body.fullscreen-open {
     font-style: italic;
     font-family: 'Songti SC', 'STSong', 'SimSun', 'Noto Serif SC', serif;
     color: #ffffff;
-    z-index: 10002;
+    z-index: 10006;
     pointer-events: auto;
     user-select: none;
     white-space: nowrap;
