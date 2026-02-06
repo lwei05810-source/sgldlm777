@@ -1,0 +1,1420 @@
+.image-fullscreen-btn {
+    color: #000000;
+}
+
+/* 样式文件 - 确保SVG正确显示 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+/* SVG覆盖层样式 */
+#svg-overlay-container {
+    z-index: 1000;
+}
+
+#svg-overlay-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#svg-overlay-close {
+    transition: opacity 0.2s ease;
+}
+
+#svg-overlay-close:hover {
+    opacity: 0.8;
+    background: rgba(0, 0, 0, 0.7) !important;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #000;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+/* 演示分享模式：只展示第二页（禁止任何修改/交互入口） */
+body.share-view #app-container {
+    display: none !important;
+}
+
+body.share-view .fullscreen-close-icon-in-image,
+body.share-view .fullscreen-forward-icon,
+body.share-view .fullscreen-seen-icon {
+    display: none !important;
+}
+
+body.share-view .fullscreen-carousel-lock {
+    display: none !important;
+}
+
+body.share-view .fullscreen-thought-text,
+body.share-view .fullscreen-birth-death {
+    pointer-events: none !important;
+    cursor: default !important;
+    user-select: none !important;
+}
+
+/* 全屏打开时：彻底禁止页面被横拉/回弹导致尺寸变化 */
+html.fullscreen-open,
+body.fullscreen-open {
+    overflow: hidden !important;
+    overscroll-behavior: none;
+    touch-action: none;
+}
+
+body.fullscreen-open {
+    position: fixed;
+    inset: 0;
+}
+
+/* 主容器 */
+.app-container {
+    /* 安卓 WebView 适配：始终按 393×851 比例在视口内等比缩放 */
+    width: 100vw;
+    height: 100dvh;
+    max-width: calc(100dvh * 393 / 851);
+    max-height: calc(100vw * 851 / 393);
+    aspect-ratio: 393 / 851;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    /* 确保在移动端和桌面端都居中显示 */
+}
+
+/* SVG容器 - 确保响应式缩放 */
+.app-container svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    /* 保持宽高比 */
+    object-fit: contain;
+}
+
+/* SVG容器 */
+.svg-container {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* 位置文字样式 - 确保与图标保持6px间距 */
+#location-text {
+    /* 文字位置已通过transform设置，确保与图标右边缘保持6px */
+}
+
+/* 位置图标可点击区域 */
+.location-icon-clickable {
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.location-icon-clickable:hover {
+    opacity: 0.8;
+}
+
+/* 导航按钮样式 */
+.nav-button-group {
+    transition: opacity 0.2s ease;
+    pointer-events: all; /* 确保整个按钮组可以点击 */
+}
+
+.nav-button-group:hover {
+    opacity: 0.9;
+}
+
+.nav-btn-rect {
+    transition: fill 0.3s ease, stroke 0.3s ease;
+    pointer-events: all; /* 确保矩形可以点击 */
+    cursor: pointer;
+}
+
+.nav-btn-text {
+    transition: fill 0.3s ease;
+    pointer-events: all; /* 文字也可以点击 */
+    cursor: pointer;
+}
+
+/* 注册按钮样式 */
+.register-button {
+    transition: opacity 0.2s ease;
+    pointer-events: bounding-box; /* 确保空心区域也可点击 */
+    cursor: pointer;
+}
+
+.register-button:hover {
+    opacity: 0.8;
+}
+
+.register-icon {
+    transition: fill 0.3s ease;
+    pointer-events: bounding-box; /* 中心空白也可点击 */
+    cursor: pointer;
+}
+
+.register-icon.registered {
+    fill: #ffd72e !important; /* 注册后变为黄色 */
+}
+
+/* 添加图片图标样式 */
+.add-image-icon {
+    transition: opacity 0.2s ease;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.add-image-icon:hover {
+    opacity: 0.8;
+}
+
+.add-image-icon circle,
+.add-image-icon line {
+    pointer-events: all;
+}
+
+/* 图片容器样式 */
+.image-container {
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    border-radius: 1.97px; /* 与四个按钮圆角一致 */
+}
+
+.slot-image {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    cursor: pointer;
+    transform-origin: center center;
+    pointer-events: all !important;
+    position: absolute;
+    border-radius: 1.97px; /* 与四个按钮圆角一致 */
+}
+
+.slot-image:active {
+    opacity: 0.8;
+}
+
+/* 放大状态 */
+.slot-image.zoomed {
+    cursor: grab;
+    z-index: 1000;
+}
+
+.slot-image.zoomed:active {
+    cursor: grabbing;
+}
+
+/* 图片删除按钮样式 - 与加号按钮尺寸一致，颜色根据图片亮度动态调整 */
+.image-remove-btn {
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 12px !important;
+    line-height: 18px !important;
+    border-width: 1.2px !important;
+    background: transparent !important;
+    /* 颜色由 JavaScript 根据图片亮度动态设置，默认白色 */
+    border-color: white !important;
+    color: white !important;
+}
+
+.image-remove-btn:hover {
+    background: transparent !important;
+    opacity: 0.8;
+    transform: scale(1.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.image-remove-btn:active {
+    transform: scale(0.9);
+    background: transparent !important;
+    opacity: 1;
+}
+
+
+/* 确保删除按钮在图片上方 */
+.image-container {
+    position: relative;
+}
+
+.image-remove-btn {
+    z-index: 10000 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* 确保删除按钮不会阻止图片的双击事件 */
+    pointer-events: auto;
+}
+
+/* 确保删除按钮始终可见且可点击 */
+.image-container:has(.slot-image[style*="display: block"]) .image-remove-btn {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* 确保图片可以接收双击事件 */
+.slot-image {
+    pointer-events: all !important;
+    z-index: 1;
+}
+
+/* 确保放大后的图片可以拖拽 */
+.slot-image[style*="scale"] {
+    cursor: grab;
+}
+
+/* 图片处理选择对话框样式 */
+.image-process-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.image-process-modal-content {
+    background: #3c3c3c;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 320px;
+    padding: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.3s ease;
+}
+
+.image-process-modal-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.image-process-modal-header h2 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.image-process-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.process-option-btn {
+    flex: 1;
+    padding: 12px 24px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.process-option-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.process-option-btn:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 注册弹窗样式 */
+.register-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.register-modal-content {
+    background: #3c3c3c;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 320px;
+    padding: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.register-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 随便看看按钮样式 */
+.guest-browse-btn {
+    background: transparent;
+    border: none;
+    color: #85d0f9;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.guest-browse-btn:hover {
+    color: #6bb8e8;
+    background: rgba(133, 208, 249, 0.1);
+}
+
+.register-modal-header h2 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.register-modal-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.register-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.register-form {
+    padding: 20px;
+}
+
+.register-form-group {
+    margin-bottom: 20px;
+}
+
+.register-form-group label {
+    display: block;
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.register-form-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.register-form-group input:focus {
+    outline: none;
+    border-color: #85d0f9;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.register-form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.register-form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.register-btn-cancel,
+.register-btn-submit {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.register-btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.register-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.register-btn-submit {
+    background: #85d0f9;
+    color: #3c3c3c;
+    font-weight: 600;
+}
+
+.register-btn-submit:hover {
+    background: #6bb8e8;
+    transform: translateY(-1px);
+}
+
+.register-btn-submit:active {
+    transform: translateY(0);
+}
+
+/* 重新发送验证码按钮 */
+.resend-code-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.resend-code-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.resend-code-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* 灵魂归属选择样式 */
+.soul-affiliation-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.soul-affiliation-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    gap: 8px;
+}
+
+.soul-affiliation-checkbox:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.soul-affiliation-checkbox input[type="checkbox"] {
+    margin: 0;
+    width: 9px;
+    height: 9px;
+    cursor: pointer;
+    accent-color: #4CAF50;
+    flex-shrink: 0;
+    align-self: center;
+    margin-right: 8px;
+}
+
+.soul-affiliation-checkbox input[type="checkbox"]:checked + span {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.soul-affiliation-checkbox:has(input[type="checkbox"]:checked) {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.soul-affiliation-checkbox span {
+    color: #fff;
+    font-size: 14px;
+    flex: 1;
+}
+
+.soul-affiliation-checkbox .soul-affiliation-note {
+    font-size: 9px !important; /* 14px * 0.64 ≈ 9px (缩小约36%，确保浏览器能正确渲染) */
+    opacity: 0.8;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.2;
+    font-weight: normal;
+    color: #fff !important;
+    transform: scale(0.9); /* 额外缩小10%以确保明显差异 */
+}
+
+/* 手机端提示框（Toast）样式 */
+.toast-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 13050;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.toast-notification.toast-show {
+    opacity: 1;
+}
+
+.toast-content {
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-family: 'FZLanTingHeiS-DB-GB', 'Microsoft YaHei', 'SimHei', sans-serif;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+/* 转发链接弹窗 */
+.share-link-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 12000;
+    backdrop-filter: blur(4px);
+}
+
+.share-link-modal-content {
+    width: 90%;
+    max-width: 340px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+}
+
+.share-link-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.share-link-title {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.share-link-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.share-link-modal-body {
+    padding: 14px 16px 8px;
+}
+
+.share-link-tip {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 12px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.share-link-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 12px;
+    outline: none;
+}
+
+.share-shot-preview {
+    margin-top: 10px;
+    width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.share-link-modal-actions {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px 16px;
+}
+
+.share-link-copy-btn,
+.share-link-cancel-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    transition: transform 0.08s ease, background-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.share-link-copy-btn {
+    background: #ffffff;
+    color: #000;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.share-link-copy-btn:active {
+    transform: scale(0.96);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.30);
+}
+
+.share-link-cancel-btn {
+    background: rgba(255, 255, 255, 0.10);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.share-link-cancel-btn:active {
+    transform: scale(0.96);
+}
+
+/* 响应式：仅保留弹窗宽度微调（不再覆盖主容器比例规则） */
+@media (max-width: 393px) {
+    .register-modal-content {
+        width: 85%;
+        max-width: 300px;
+    }
+}
+
+/* 小图框样式 */
+.thumbnail-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    border-radius: 2px;
+    transition: border 0.2s ease;
+}
+
+.thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    pointer-events: all;
+    transition: opacity 0.2s ease;
+}
+
+.thumbnail-image:hover {
+    opacity: 0.9;
+}
+
+.thumbnail-image:active {
+    opacity: 0.8;
+}
+
+
+/* 思念文字点击样式 */
+.thought-text-clickable {
+    transition: opacity 0.2s ease;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.thought-text-clickable:hover {
+    opacity: 0.8;
+}
+
+/* 显示在主图片上的思念文字和生卒年可点击样式 */
+.thought-display-clickable,
+.birth-death-display-clickable {
+    transition: opacity 0.2s ease;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.thought-display-clickable:hover,
+.birth-death-display-clickable:hover {
+    opacity: 0.7;
+}
+
+/* 思念文字输入对话框样式 */
+.thought-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.thought-modal-content {
+    background: #3c3c3c;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 320px;
+    padding: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.3s ease;
+    max-height: 85vh;
+    overflow: hidden;
+}
+
+.thought-modal-header h2 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.thought-modal-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: opacity 0.2s ease;
+}
+
+.thought-modal-close:hover {
+    opacity: 0.7;
+}
+
+.thought-modal-body {
+    padding: 18px 20px;
+    overflow-y: auto;
+}
+
+.thought-color-panel {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+}
+
+.thought-color-sv {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+}
+
+.thought-color-cursor {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow: none;
+    transform: translate(-7px, -7px);
+    pointer-events: none;
+}
+
+.thought-color-hue {
+    width: 100%;
+    margin-top: 10px;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+    outline: none;
+}
+
+.thought-color-hue::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    box-shadow: none;
+}
+
+.thought-color-hue::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    box-shadow: none;
+}
+
+.thought-color-presets {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.thought-color-preset {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 0;
+}
+
+.thought-color-hex-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.thought-color-hex {
+    flex: 1;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 12px;
+    outline: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.thought-color-hex-tip {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.thought-input {
+    width: 100%;
+    min-height: 30px;
+    max-height: 40px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-family: 'AdobeSongStd-Light', 'Adobe Song Std', serif;
+    resize: none;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+
+.birth-death-input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-family: 'AdobeSongStd-Light', 'Adobe Song Std', serif;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.birth-death-input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.birth-death-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.thought-input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.thought-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.thought-modal-actions {
+    display: flex;
+    gap: 10px;
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.thought-btn-cancel,
+.thought-btn-submit {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'FZLanTingHeiS-DB-GB', sans-serif;
+}
+
+.thought-btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.thought-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.thought-btn-submit {
+    background: #fff;
+    color: #3c3c3c;
+}
+
+.thought-btn-submit:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.02);
+}
+
+.thought-btn-submit:active {
+    transform: scale(0.98);
+}
+
+/* 全屏模态样式 */
+.fullscreen-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* 动态视口高度，适配移动端 */
+    background: #000;
+    z-index: 10000;
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+    /* 与顶部无间距，限制宽度不超出视口 */
+}
+
+.fullscreen-container {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+    padding-top: 0;
+    margin-top: 0;
+    /* 与顶部无间距 */
+}
+
+.fullscreen-content {
+    position: relative;
+    /* 保持与第一页相同的整体长宽比例（393×851） */
+    width: 100vw;
+    height: 100dvh;
+    max-width: calc(100dvh * 393 / 851);
+    max-height: calc(100vw * 851 / 393);
+    aspect-ratio: 393 / 851;
+    display: flex;
+    flex-direction: column;
+    /* 让图片容器可占满画布宽度（与第一页一致） */
+    align-items: stretch;
+    padding-top: 0;
+    margin-top: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    /* 与顶部无间距，限制宽度不超出视口 */
+}
+
+.fullscreen-candle-video {
+    position: absolute;
+    left: calc(50% - 55px);
+    transform-origin: bottom center;
+    transform: translateX(-50%) scale(2.38);
+    bottom: env(safe-area-inset-bottom, 0px);
+    width: min(220px, 55vw);
+    height: auto;
+    max-height: 65vh;
+    object-fit: contain;
+    z-index: 10005;
+    pointer-events: none;
+    opacity: 1;
+}
+
+.fullscreen-candle-video-5 {
+    position: absolute;
+    right: 18px;
+    bottom: env(safe-area-inset-bottom, 0px);
+    width: 32%;
+    max-width: 140px;
+    height: auto;
+    max-height: 24vh;
+    object-fit: contain;
+    z-index: 10005;
+    pointer-events: none;
+    opacity: 1;
+}
+
+.fullscreen-image-wrapper {
+    position: relative;
+    /* 与第一页主图一致：满宽 393（在画布内等比缩放后为满宽） */
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* 图片上边缘贴状态栏：无上边距 */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* 确保文字可以相对于此容器绝对定位，图片居中显示 */
+    /* 固定为第一页主图框比例：393 × 573.113 */
+    aspect-ratio: 393 / 573.113;
+}
+
+.fullscreen-carousel-lock {
+    position: absolute;
+    left: 10px;
+    bottom: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    background: rgba(0, 0, 0, 0.25);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10006;
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 0;
+}
+
+.fullscreen-carousel-lock svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
+.fullscreen-carousel-lock[data-locked="1"] .lock-unlocked { display: none; }
+.fullscreen-carousel-lock[data-locked="0"] .lock-locked { display: none; }
+
+.fullscreen-image {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    /* 与第一页一致：填满主图框（可能裁切） */
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    /* 宽高由外层图片框决定 */
+}
+
+.fullscreen-close-icon-in-image {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    cursor: pointer;
+    z-index: 10001;
+    pointer-events: all;
+    transition: opacity 0.2s ease;
+    /* 按钮位置相对于图片容器，确保在图片内部 */
+    color: #000000;
+}
+
+.fullscreen-close-icon-in-image:hover {
+    opacity: 0.7;
+}
+
+.fullscreen-image-wrapper {
+    /* 图片容器仅承载图片与文字覆盖层（按钮层改为固定在画布内，避免 WebView 偏移） */
+}
+
+.fullscreen-actions {
+    position: absolute;
+    inset: 0;
+    z-index: 10006;
+    pointer-events: none; /* 只让具体按钮可点 */
+}
+
+.fullscreen-carousel-lock {
+    /* 固定在图片区域左下角 */
+    position: absolute;
+    left: 10px;
+    bottom: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    background: rgba(0, 0, 0, 0.25);
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10006;
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 0;
+}
+
+.fullscreen-actions-right {
+    position: absolute;
+    right: 10px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 206px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    pointer-events: none;
+    transform: translate(6px, -46px);
+}
+
+.fullscreen-forward-icon {
+    position: relative;
+    width: 33px;
+    height: 33px;
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 0.95;
+}
+
+.fullscreen-forward-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* 反色：原黑色底变白，原白色箭头变黑 */
+.fullscreen-forward-icon .forward-bg { fill: #fff; stroke: #fff; stroke-width: 2.2; paint-order: stroke fill; vector-effect: non-scaling-stroke; }
+.fullscreen-forward-icon .forward-fg { fill: #000; stroke: #000; stroke-width: 2.2; paint-order: stroke fill; vector-effect: non-scaling-stroke; }
+
+.fs-action-count {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 2px);
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* "看过" 图标已移除 */
+
+.fullscreen-thought-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 38.4px;
+    font-weight: bold;
+    font-family: FZLanTingHeiS-DB-GB, 'Microsoft YaHei', 'SimHei', sans-serif;
+    color: #fff;
+    white-space: nowrap;
+    z-index: 10002;
+    pointer-events: auto;
+    user-select: none;
+    outline: none;
+    cursor: pointer;
+    /* 原始位置：相对于图片框，x=195.0205-12.5=182.5205（图片中心），y=662-189=473（图片底部附近） */
+    /* 位置会在JavaScript中动态计算 */
+}
+
+.fullscreen-birth-death {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 20.4px;
+    font-weight: normal;
+    font-family: FZLanTingHeiS-DB-GB, 'Microsoft YaHei', 'SimHei', sans-serif;
+    color: #fff;
+    white-space: nowrap;
+    z-index: 10002;
+    pointer-events: auto;
+    user-select: none;
+    outline: none;
+    cursor: pointer;
+    /* 原始位置：相对于图片框，x=195.0205-12.5=182.5205（图片中心），y=692-189=503（图片底部） */
+    /* 位置会在JavaScript中动态计算 */
+}
+
+.fullscreen-thought-text:empty::before {
+    content: "永远怀念";
+    opacity: 0.45;
+}
+
+.fullscreen-birth-death:empty::before {
+    content: "1949-2049";
+    opacity: 0.45;
+}
+
+.fullscreen-note-text {
+    position: absolute;
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 12px;
+    font-weight: 400;
+    font-style: italic;
+    font-family: 'Songti SC', 'STSong', 'SimSun', 'Noto Serif SC', serif;
+    color: #ffffff;
+    z-index: 10002;
+    pointer-events: auto;
+    user-select: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.fullscreen-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10001;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    /* 考虑安全区域，但保持与状态栏无间距 */
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
+}
+
+.fullscreen-close-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+
+.fullscreen-close-btn:active {
+    transform: scale(0.9);
+}
+
